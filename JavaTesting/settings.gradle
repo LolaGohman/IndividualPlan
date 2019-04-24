@@ -1,0 +1,4 @@
+rootProject.name = 'JavaTesting'
+include 'Task1'
+include 'Task1'
+
