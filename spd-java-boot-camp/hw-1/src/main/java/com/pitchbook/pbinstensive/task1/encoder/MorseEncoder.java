@@ -34,3 +34,4 @@ public class MorseEncoder implements Encoder {
     }
 
 }
+

@@ -22,7 +22,7 @@ public class CaesarEncoder implements Encoder {
                         String symbolToAppend = PropertyReader.readPropertyValueByKey(CAESAR_PROPERTIES_FILE_NAME,
                                 letter.toUpperCase());
                         if (Character.isLowerCase(letter.charAt(0))) {
-                           resultString.append(symbolToAppend.toLowerCase());
+                            resultString.append(symbolToAppend.toLowerCase());
                         } else {
                             resultString.append(symbolToAppend);
                         }
@@ -38,3 +38,4 @@ public class CaesarEncoder implements Encoder {
     }
 
 }
+

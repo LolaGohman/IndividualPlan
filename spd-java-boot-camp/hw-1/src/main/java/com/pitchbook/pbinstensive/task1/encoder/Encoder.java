@@ -5,3 +5,4 @@ public interface Encoder {
     String encode(String input);
 
 }
+

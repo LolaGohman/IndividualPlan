@@ -1,7 +1,6 @@
 package com.pitchbook.pbinstensive.task1;
 
 import com.pitchbook.pbinstensive.task1.exception.PropertyDoesNotExistException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -11,8 +10,7 @@ public class PropertyReader {
 
     public static String readPropertyValueByKey(String fileName, String key) throws PropertyDoesNotExistException {
         Properties propertyFile = getPropertyFileByName(fileName);
-        if (!key.isBlank() &&
-                (propertyFile != null ? propertyFile.getProperty(key) : null) != null) {
+        if (!key.isBlank() && propertyFile.getProperty(key) != null) {
             return propertyFile.getProperty(key);
         } else {
             throw new PropertyDoesNotExistException("Value with key: '" + key + "' does not exist!");

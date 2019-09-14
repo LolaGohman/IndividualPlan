@@ -23,7 +23,7 @@ public class MorseDecoder implements Decoder {
                         resultString.append(PropertyReader.readPropertyKeyByValue(MORSE_PROPERTIES_FILE_NAME,
                                 letter.toUpperCase()));
                     } catch (PropertyDoesNotExistException e) {
-                       throw new RuntimeException(e);
+                        throw new RuntimeException(e);
                     }
                 }
             }

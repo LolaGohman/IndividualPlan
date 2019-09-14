@@ -4,7 +4,6 @@ import com.pitchbook.pbinstensive.task1.encoder.CaesarEncoder;
 import com.pitchbook.pbinstensive.task1.encoder.Encoder;
 import com.pitchbook.pbinstensive.task1.EncodingType;
 import com.pitchbook.pbinstensive.task1.encoder.MorseEncoder;
-
 import java.util.Map;
 
 public class Encoders {
