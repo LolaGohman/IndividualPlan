@@ -16,7 +16,7 @@ public class Main {
             String encoder = args[0];
             String phrase = args[1];
             String encodedSymbol = Encoders.getEncoder(encoder).encode(phrase);
-            System.out.println("Phrase encoded by " + encoder.toUpperCase() + " is: '" + encodedSymbol + "'.");
+            System.out.println("Phrase encoded by " + encoder.toUpperCase() + " is: '" + encodedSymbol);
             String decodedSymbol = Decoders.getDecoder(encoder).decode(encodedSymbol);
             System.out.println("Decoded phrase: " + decodedSymbol);
         }
