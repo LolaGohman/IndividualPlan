@@ -1,0 +1,3 @@
+rootProject.name = 'spd-java-boot-camp'
+include 'hw-1'
+
