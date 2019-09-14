@@ -8,7 +8,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/Task1" />
+            <option value="$PROJECT_DIR$/hw-1" />
+            <option value="$PROJECT_DIR$/hw-2" />
           </set>
         </option>
         <option name="useQualifiedModuleNames" value="true" />
