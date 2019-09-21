@@ -1,8 +1,11 @@
-plugins {
-    id 'java'
-}
-
-
 repositories {
     mavenCentral()
+}
+
+dependencies {
+    testCompile libs.test
+}
+
+test {
+    useTestNG {}
 }
