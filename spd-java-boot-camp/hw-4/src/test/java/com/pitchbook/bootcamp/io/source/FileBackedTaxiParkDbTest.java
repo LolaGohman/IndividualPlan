@@ -20,6 +20,7 @@ public class FileBackedTaxiParkDbTest {
     private File tempFolder;
 
     @BeforeMethod
+
     public void setUp() {
         tempFolder = new File(System.getProperty("java.io.tmpdir"), "io-test-" + System.currentTimeMillis());
     }

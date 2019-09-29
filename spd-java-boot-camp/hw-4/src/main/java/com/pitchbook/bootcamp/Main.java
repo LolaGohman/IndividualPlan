@@ -3,7 +3,6 @@ package com.pitchbook.bootcamp;
 import com.pitchbook.bootcamp.io.analytics.TaxiParkDbAnalytic;
 import com.pitchbook.bootcamp.io.model.Driver;
 import com.pitchbook.bootcamp.io.source.db.FileBackedTaxiParkDb;
-import com.pitchbook.bootcamp.io.source.db.TaxiParkDb;
 import com.pitchbook.bootcamp.io.source.initialization.DriversPopulator;
 import com.pitchbook.bootcamp.io.source.initialization.PassengersPopulator;
 import com.pitchbook.bootcamp.io.source.initialization.TripsPopulator;
@@ -18,20 +17,19 @@ public class Main {
 
     public static void main(String[] args) {
 
-        String dbFilePath = Thread.currentThread().getContextClassLoader().getResource("com/pitchbook/bootcamp/io/db/db.json").getPath();
+        String dbFilePath = Thread.currentThread().getContextClassLoader().getResource("com/pitchbook/bootcamp/io/db/db.txt").getPath();
         String passengersPath = Thread.currentThread().getContextClassLoader().getResource("com/pitchbook/bootcamp/io/data/passengers.dat").getPath();
         String driversPath = Thread.currentThread().getContextClassLoader().getResource("com/pitchbook/bootcamp/io/data/drivers.dat").getPath();
         String tripsPath = Thread.currentThread().getContextClassLoader().getResource("com/pitchbook/bootcamp/io/data/trips.dat").getPath();
 
-        TaxiParkDb taxiParkDb = new FileBackedTaxiParkDb(dbFilePath);
-
+        FileBackedTaxiParkDb testTaxiParkDb = new FileBackedTaxiParkDb(dbFilePath);
         List.of(
                 new PassengersPopulator(passengersPath),
                 new DriversPopulator(driversPath),
                 new TripsPopulator(tripsPath)
-        ).forEach(dbPopulator -> dbPopulator.apply(taxiParkDb));
+        ).forEach(dbPopulator -> dbPopulator.apply(testTaxiParkDb));
 
-        TaxiParkDb reconnectedTaxiParkDb = new FileBackedTaxiParkDb(dbFilePath);
+       FileBackedTaxiParkDb reconnectedTaxiParkDb = new FileBackedTaxiParkDb(dbFilePath);
 
         TaxiParkDbAnalytic analytics = new TaxiParkDbAnalytic(reconnectedTaxiParkDb);
         Map<Driver, Integer> driversEarnings = analytics.calculateDriversEarnings();

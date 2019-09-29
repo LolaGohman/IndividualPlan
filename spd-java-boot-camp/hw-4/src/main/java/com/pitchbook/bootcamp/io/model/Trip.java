@@ -18,9 +18,7 @@ public class Trip implements Serializable {
 
     private  Double discount;
 
-    public Trip(){
 
-    }
 
     public Trip(
             Driver driver,

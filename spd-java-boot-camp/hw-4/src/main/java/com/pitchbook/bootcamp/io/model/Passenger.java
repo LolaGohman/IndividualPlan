@@ -6,11 +6,7 @@ public class Passenger implements Serializable {
 
     private static final long serialVersionUID = 2079921069070819788L;
 
-    private  String name;
-
-    public Passenger(){
-
-    }
+    private final String name;
 
     public Passenger(String name) {
         this.name = name;
@@ -18,10 +14,6 @@ public class Passenger implements Serializable {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     @Override

@@ -1,16 +1,16 @@
 package com.pitchbook.bootcamp.io.model;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-public class TaxiPark {
+public class TaxiPark implements Serializable {
 
-    private Set<Driver> allDrivers;
-    private Set<Passenger> allPassengers;
-    private List<Trip> allTrips;
+    private final Set<Driver> allDrivers;
+    private final Set<Passenger> allPassengers;
+    private final List<Trip> allTrips;
 
-    public TaxiPark() {
-    }
+
 
     public TaxiPark(
             Set<Driver> allDrivers,
@@ -32,18 +32,6 @@ public class TaxiPark {
 
     public List<Trip> getAllTrips() {
         return allTrips;
-    }
-
-    public void setAllPassengers(Set<Passenger> allPassengers) {
-        this.allPassengers = allPassengers;
-    }
-
-    public void setAllDrivers(Set<Driver> allDrivers) {
-        this.allDrivers = allDrivers;
-    }
-
-    public void setAllTrips(List<Trip> allTrips) {
-        this.allTrips = allTrips;
     }
 
     @Override

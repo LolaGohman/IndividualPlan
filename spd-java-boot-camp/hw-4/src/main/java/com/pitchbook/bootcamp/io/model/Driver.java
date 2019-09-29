@@ -7,18 +7,12 @@ public class Driver implements Serializable {
 
     private static final long serialVersionUID = -6808516096934631227L;
 
-    private String name;
+    private final String name;
 
     public Driver(String name) {
         this.name = name;
     }
-    public Driver(){
 
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getName() {
         return name;

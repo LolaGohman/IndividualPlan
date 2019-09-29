@@ -1,16 +1,18 @@
 package com.pitchbook.bootcamp.io.source.db;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pitchbook.bootcamp.io.model.Driver;
 import com.pitchbook.bootcamp.io.model.Passenger;
 import com.pitchbook.bootcamp.io.model.TaxiPark;
 import com.pitchbook.bootcamp.io.model.Trip;
 
-import java.io.File;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.EOFException;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,16 +23,11 @@ public class FileBackedTaxiParkDb implements TaxiParkDb {
 
     private String dbFilePath;
 
-    public FileBackedTaxiParkDb(String dbFilePath)  {
+    public FileBackedTaxiParkDb(String dbFilePath) {
         this.dbFilePath = dbFilePath;
-        try{
-            if(readDatabase(dbFilePath)==null){
-                initDatabase(new TaxiPark(new HashSet<>(), new HashSet<>(), new ArrayList<>()), dbFilePath);
-
-            }else {
-                initDatabase(readDatabase(dbFilePath), dbFilePath);
-            }
-        }catch (IOException e){
+        try {
+            writeTaxiParkToDatabase(readDatabase(dbFilePath), dbFilePath);
+        } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -40,7 +37,7 @@ public class FileBackedTaxiParkDb implements TaxiParkDb {
         if (findDriver(driver.getName()).isEmpty()) {
             try {
                 addDriverToDriverPark(driver, dbFilePath);
-            } catch (IOException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -50,7 +47,7 @@ public class FileBackedTaxiParkDb implements TaxiParkDb {
     public Set<Driver> getAllDrivers() {
         try {
             return readDatabase(dbFilePath).getAllDrivers();
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -69,7 +66,7 @@ public class FileBackedTaxiParkDb implements TaxiParkDb {
     public void addPassenger(Passenger passenger) {
         try {
             addPassengerToDriverPark(passenger, dbFilePath);
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -89,7 +86,7 @@ public class FileBackedTaxiParkDb implements TaxiParkDb {
         Set<Passenger> passengers;
         try {
             passengers = new HashSet<>(readDatabase(dbFilePath).getAllPassengers());
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
         return passengers;
@@ -99,7 +96,7 @@ public class FileBackedTaxiParkDb implements TaxiParkDb {
     public List<Trip> getAllTrips() {
         try {
             return readDatabase(dbFilePath).getAllTrips();
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -108,49 +105,45 @@ public class FileBackedTaxiParkDb implements TaxiParkDb {
     public void addTrip(Trip trip) {
         try {
             addTripToDriverPark(trip, dbFilePath);
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void addPassengerToDriverPark(Passenger passenger, String dbFilePath) throws IOException {
+    private void addPassengerToDriverPark(Passenger passenger, String dbFilePath) throws IOException, ClassNotFoundException {
         TaxiPark taxiPark = readDatabase(dbFilePath);
         taxiPark.getAllPassengers().add(passenger);
-        initDatabase(taxiPark, dbFilePath);
+        writeTaxiParkToDatabase(taxiPark, dbFilePath);
     }
 
-    private void addDriverToDriverPark(Driver driver, String dbFilePath) throws IOException {
+    private void addDriverToDriverPark(Driver driver, String dbFilePath) throws IOException, ClassNotFoundException {
         TaxiPark taxiPark = readDatabase(dbFilePath);
         taxiPark.getAllDrivers().add(driver);
-        initDatabase(taxiPark, dbFilePath);
+        writeTaxiParkToDatabase(taxiPark, dbFilePath);
     }
 
-    private void addTripToDriverPark(Trip trip, String dbFilePath) throws IOException {
+    private void addTripToDriverPark(Trip trip, String dbFilePath) throws IOException, ClassNotFoundException {
         TaxiPark taxiPark = readDatabase(dbFilePath);
         taxiPark.getAllTrips().add(trip);
-        initDatabase(taxiPark, dbFilePath);
+        writeTaxiParkToDatabase(taxiPark, dbFilePath);
     }
 
-    private void initDatabase(TaxiPark taxiPark, String dbFilePath) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(new File(dbFilePath), taxiPark);
+    private void writeTaxiParkToDatabase(TaxiPark taxiPark, String dbFilePath) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(dbFilePath);
+             BufferedOutputStream bos = new BufferedOutputStream(fos);
+             ObjectOutputStream ous = new ObjectOutputStream(bos)) {
+            ous.writeObject(taxiPark);
+        }
     }
 
-    private TaxiPark readDatabase(String databaseUrl) throws IOException {
-        ObjectMapper mapper;
-        TaxiPark taxiPark;
-        try (InputStream inputStream = new FileInputStream(databaseUrl)) {
-            mapper = new ObjectMapper();
-            TypeReference<TaxiPark> reference = new TypeReference<>() {
-            };
-            try {
-                taxiPark = mapper.readValue(inputStream, reference);
-            }catch (Exception e){
-                taxiPark = null;
-            }
-
+    private TaxiPark readDatabase(String databaseUrl) throws IOException, ClassNotFoundException {
+        TaxiPark taxiPark = new TaxiPark(new HashSet<>(), new HashSet<>(), new ArrayList<>());
+        try (FileInputStream fis = new FileInputStream(databaseUrl);
+             BufferedInputStream bis = new BufferedInputStream(fis);
+             ObjectInputStream ois = new ObjectInputStream(bis)) {
+            taxiPark = (TaxiPark) ois.readObject();
+        } catch (EOFException ignored) {
         }
         return taxiPark;
     }
-
 }
