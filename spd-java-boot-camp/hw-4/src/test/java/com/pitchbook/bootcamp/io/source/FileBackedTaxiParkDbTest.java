@@ -20,7 +20,6 @@ public class FileBackedTaxiParkDbTest {
     private File tempFolder;
 
     @BeforeMethod
-
     public void setUp() {
         tempFolder = new File(System.getProperty("java.io.tmpdir"), "io-test-" + System.currentTimeMillis());
     }
@@ -28,7 +27,6 @@ public class FileBackedTaxiParkDbTest {
     @Test
     public void database_file_should_be_created_if_does_not_exist() {
         new FileBackedTaxiParkDb(new File(tempFolder, "taxiPark.db").getAbsolutePath());
-
         boolean created = new File(tempFolder, "taxiPark.db").exists();
         assertTrue(created);
     }

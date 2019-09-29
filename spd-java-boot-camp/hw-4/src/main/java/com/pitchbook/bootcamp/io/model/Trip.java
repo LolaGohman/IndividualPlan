@@ -2,23 +2,22 @@ package com.pitchbook.bootcamp.io.model;
 
 import java.beans.Transient;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Set;
 
 public class Trip implements Serializable {
 
     private static final long serialVersionUID = -5229380833234915039L;
 
-    private  Driver driver;
+    private final Driver driver;
 
-    private  Set<Passenger> passengers;
+    private final Set<Passenger> passengers;
 
-    private  int duration;
+    private final int duration;
 
-    private  double distance;
+    private final double distance;
 
-    private  Double discount;
-
-
+    private final Double discount;
 
     public Trip(
             Driver driver,
@@ -33,27 +32,6 @@ public class Trip implements Serializable {
         this.distance = distance;
         this.discount = discount;
     }
-
-    public void setDriver(Driver driver) {
-        this.driver = driver;
-    }
-
-    public void setPassengers(Set<Passenger> passengers) {
-        this.passengers = passengers;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    public void setDistance(double distance) {
-        this.distance = distance;
-    }
-
-    public void setDiscount(Double discount) {
-        this.discount = discount;
-    }
-
 
     public Driver getDriver() {
         return driver;
@@ -78,12 +56,12 @@ public class Trip implements Serializable {
     @Override
     public String toString() {
         return "Trip{" +
-            "driver=" + driver +
-            ", passengers=" + passengers +
-            ", duration=" + duration +
-            ", distance=" + distance +
-            ", discount=" + discount +
-            "} \n";
+                "driver=" + driver +
+                ", passengers=" + passengers +
+                ", duration=" + duration +
+                ", distance=" + distance +
+                ", discount=" + discount +
+                "} \n";
     }
 
     /**
@@ -93,5 +71,22 @@ public class Trip implements Serializable {
     public double getCost() {
         double discountValue = discount == null ? 0.0 : discount;
         return (1 - discountValue) * (duration + distance);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Trip trip = (Trip) o;
+        return duration == trip.duration &&
+                Double.compare(trip.distance, distance) == 0 &&
+                Objects.equals(driver, trip.driver) &&
+                Objects.equals(passengers, trip.passengers) &&
+                Objects.equals(discount, trip.discount);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(driver, passengers, duration, distance, discount);
     }
 }

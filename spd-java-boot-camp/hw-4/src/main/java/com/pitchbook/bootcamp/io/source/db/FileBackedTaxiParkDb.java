@@ -8,6 +8,7 @@ import com.pitchbook.bootcamp.io.model.Trip;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.EOFException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,7 +25,15 @@ public class FileBackedTaxiParkDb implements TaxiParkDb {
     private String dbFilePath;
 
     public FileBackedTaxiParkDb(String dbFilePath) {
-        this.dbFilePath = dbFilePath;
+        File file = new File(dbFilePath);
+        if (!file.exists()) {
+            try {
+                createNewFileWithSubfolders(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        this.dbFilePath = file.getAbsolutePath();
         try {
             writeTaxiParkToDatabase(readDatabase(dbFilePath), dbFilePath);
         } catch (IOException | ClassNotFoundException e) {
@@ -145,5 +154,13 @@ public class FileBackedTaxiParkDb implements TaxiParkDb {
         } catch (EOFException ignored) {
         }
         return taxiPark;
+    }
+
+    private void createNewFileWithSubfolders(File file) throws IOException {
+        File parent = file.getParentFile();
+        if (!parent.exists()) {
+            parent.mkdirs();
+            file.createNewFile();
+        }
     }
 }

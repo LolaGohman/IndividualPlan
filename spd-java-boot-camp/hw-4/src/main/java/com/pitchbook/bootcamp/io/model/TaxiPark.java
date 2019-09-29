@@ -6,11 +6,11 @@ import java.util.Set;
 
 public class TaxiPark implements Serializable {
 
+    private static final long serialVersionUID = -665L;
+
     private final Set<Driver> allDrivers;
     private final Set<Passenger> allPassengers;
     private final List<Trip> allTrips;
-
-
 
     public TaxiPark(
             Set<Driver> allDrivers,
