@@ -1,16 +1,22 @@
 package com.pitchbook.bootcamp.io.source.db;
 
-import com.pitchbook.bootcamp.AppendableOutputStream;
 import com.pitchbook.bootcamp.io.model.Driver;
 import com.pitchbook.bootcamp.io.model.Passenger;
+import com.pitchbook.bootcamp.io.model.TaxiPark;
 import com.pitchbook.bootcamp.io.model.Trip;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,31 +25,34 @@ import java.util.Set;
 
 public class FileBackedTaxiParkDb implements TaxiParkDb {
 
-    private String dbFilePath;
+    private final String dbFilePath;
+    private final TaxiPark taxiParkEmulator = new TaxiPark(new HashSet<>(),
+            new HashSet<>(), new ArrayList<>());
 
     public FileBackedTaxiParkDb(String dbFilePath) {
-        File file = new File(dbFilePath);
-        if (!file.exists()) {
+        Path file = Paths.get(dbFilePath);
+        if (!Files.exists(file)) {
             try {
                 createNewFileWithSubFolders(file);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        this.dbFilePath = file.getAbsolutePath();
+        this.dbFilePath = file.toAbsolutePath().toString();
+        fillTaxiParkEmulatorOnInit();
     }
 
     @Override
     public void addDriver(Driver driver) {
         if (findDriver(driver.getName()).isEmpty()) {
-
             writeObjectToDatabase(driver);
+            taxiParkEmulator.getAllDrivers().add(driver);
         }
     }
 
     @Override
     public Set<Driver> getAllDrivers() {
-        return readAllDrivers();
+        return taxiParkEmulator.getAllDrivers();
     }
 
     @Override
@@ -60,6 +69,7 @@ public class FileBackedTaxiParkDb implements TaxiParkDb {
     public void addPassenger(Passenger passenger) {
         if (findPassenger(passenger.getName()).isEmpty()) {
             writeObjectToDatabase(passenger);
+            taxiParkEmulator.getAllPassengers().add(passenger);
         }
     }
 
@@ -75,95 +85,44 @@ public class FileBackedTaxiParkDb implements TaxiParkDb {
 
     @Override
     public Set<Passenger> getAllPassengers() {
-        return readAllPassengers();
+        return taxiParkEmulator.getAllPassengers();
     }
 
     @Override
     public List<Trip> getAllTrips() {
-        return readAllTrips();
+        return taxiParkEmulator.getAllTrips();
     }
 
     @Override
     public void addTrip(Trip trip) {
         writeObjectToDatabase(trip);
+        taxiParkEmulator.getAllTrips().add(trip);
     }
 
 
-
-
-
-
-
-
-
-    private void createNewFileWithSubFolders(File file) throws IOException {
-        File parent = file.getParentFile();
-        if (!parent.exists()) {
-            parent.mkdirs();
-            file.createNewFile();
+    private void createNewFileWithSubFolders(Path file) throws IOException {
+        Path parent = file.getParent();
+        if (!Files.exists(parent)) {
+            Files.createDirectories(parent);
         }
+        Files.createFile(file);
     }
 
-    private <T> void writeObjectToDatabase(T object) {
-        if (new File(dbFilePath).length() == 0) {
-            try (FileOutputStream fos = new FileOutputStream(dbFilePath, true);
-                 ObjectOutputStream aos = new ObjectOutputStream(fos)) {
-                aos.writeObject(object);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try (FileOutputStream fos = new FileOutputStream(dbFilePath, true);
-                 AppendableOutputStream aos = new AppendableOutputStream(fos)) {
-                aos.writeObject(object);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    private void fillTaxiParkEmulatorOnInit() {
+        taxiParkEmulator.getAllDrivers().addAll(new HashSet<>(readObjectsFromDatabase(Driver.class)));
+        taxiParkEmulator.getAllPassengers().addAll(new HashSet<>(readObjectsFromDatabase(Passenger.class)));
+        taxiParkEmulator.getAllTrips().addAll(readObjectsFromDatabase(Trip.class));
     }
 
-    private Set<Passenger> readAllPassengers() {
-        Set<Passenger> passengers = new HashSet<>();
-        try (FileInputStream fis = new FileInputStream(dbFilePath);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
+    private <T> List<T> readObjectsFromDatabase(Class<T> objectClass) {
+        List<T> list = new ArrayList<>();
+        try (InputStream inputStream = Files.newInputStream(Paths.get(dbFilePath));
+             BufferedInputStream bis = new BufferedInputStream(inputStream);
+             ObjectInputStream ois = new ObjectInputStream(bis)) {
             while (true) {
                 Object object = ois.readObject();
-                if (object instanceof Passenger) {
-                    passengers.add((Passenger) object);
-                }
-            }
-        } catch (EOFException ignored) {
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return passengers;
-    }
-
-    private Set<Driver> readAllDrivers() {
-        Set<Driver> drivers = new HashSet<>();
-        try (FileInputStream fis = new FileInputStream(dbFilePath);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
-            while (true) {
-                Object object = ois.readObject();
-                if (object instanceof Driver) {
-                    drivers.add((Driver) object);
-                }
-            }
-        } catch (EOFException ignored) {
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return drivers;
-    }
-
-    private List<Trip> readAllTrips() {
-        List<Trip> list = new ArrayList<>();
-        try (FileInputStream fis = new FileInputStream(dbFilePath);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
-            while (true) {
-                Object object = ois.readObject();
-                if (object instanceof Trip) {
-                    list.add((Trip) object);
+                if (object.getClass() == objectClass) {
+                    list.add((T) object);
                 }
             }
         } catch (EOFException ignored) {
@@ -171,6 +130,25 @@ public class FileBackedTaxiParkDb implements TaxiParkDb {
             throw new RuntimeException(e);
         }
         return list;
+    }
+
+    private <T> void writeObjectToDatabase(T object) {
+        try (OutputStream os = Files.newOutputStream(Paths.get(dbFilePath), StandardOpenOption.APPEND);
+             BufferedOutputStream bos = new BufferedOutputStream(os);
+             ObjectOutputStream aos = getObjectOutputStream(bos)) {
+            aos.writeObject(object);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private ObjectOutputStream getObjectOutputStream(OutputStream out) throws IOException {
+        return isFileEmpty(Paths.get(dbFilePath)) ?
+                new ObjectOutputStream(out) : new AppendableOutputStream(out);
+    }
+
+    private boolean isFileEmpty(Path file) throws IOException {
+        return Files.size(file) == 0;
     }
 
 }

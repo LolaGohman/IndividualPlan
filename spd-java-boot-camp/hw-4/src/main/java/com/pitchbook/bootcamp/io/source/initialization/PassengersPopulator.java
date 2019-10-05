@@ -5,10 +5,12 @@ import com.pitchbook.bootcamp.io.source.db.TaxiParkDb;
 
 import java.io.BufferedInputStream;
 import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,10 +36,10 @@ public class PassengersPopulator implements DbInitializer {
     }
 
     private Set<Passenger> readPassengers() throws IOException, ClassNotFoundException {
-        File source = new File(resourcePath);
+        Path source = Paths.get(resourcePath);
         Set<Passenger> passengers = new HashSet<>();
-        try (FileInputStream fis = new FileInputStream(source);
-             BufferedInputStream bis = new BufferedInputStream(fis);
+        try (InputStream is = Files.newInputStream(source);
+             BufferedInputStream bis = new BufferedInputStream(is);
              ObjectInputStream ois = new ObjectInputStream(bis)) {
             passengers = (Set<Passenger>) ois.readObject();
         } catch (EOFException ignored) {

@@ -1,12 +1,12 @@
-package com.pitchbook.bootcamp;
+package com.pitchbook.bootcamp.io.source.db;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
-public class AppendableOutputStream extends ObjectOutputStream {
+class AppendableOutputStream extends ObjectOutputStream {
 
-    public AppendableOutputStream(OutputStream out) throws IOException {
+    AppendableOutputStream(OutputStream out) throws IOException {
         super(out);
     }
 

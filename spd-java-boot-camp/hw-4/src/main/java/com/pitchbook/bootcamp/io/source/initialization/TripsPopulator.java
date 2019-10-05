@@ -5,10 +5,12 @@ import com.pitchbook.bootcamp.io.source.db.TaxiParkDb;
 
 import java.io.BufferedInputStream;
 import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,13 +35,13 @@ public class TripsPopulator implements DbInitializer {
         }
     }
 
-    public List<Trip> readTrips() throws IOException, ClassNotFoundException {
-        File source = new File(resourcePath);
+    private List<Trip> readTrips() throws IOException, ClassNotFoundException {
+        Path source = Paths.get(resourcePath);
         List<Trip> trips = new ArrayList<>();
-        try (FileInputStream fis = new FileInputStream(source);
-             BufferedInputStream bis = new BufferedInputStream(fis);
+        try (InputStream is = Files.newInputStream(source) ;
+             BufferedInputStream bis = new BufferedInputStream(is);
              ObjectInputStream ois = new ObjectInputStream(bis)) {
-            trips = (List<Trip>) ois.readObject();
+             trips = (List<Trip>) ois.readObject();
         } catch (EOFException ignored) {
         }
         return trips;

@@ -1,10 +1,8 @@
-package com.pitchbook.bootcamp.io.source;
+package com.pitchbook.bootcamp.io.source.db;
 
 import com.pitchbook.bootcamp.io.model.Driver;
 import com.pitchbook.bootcamp.io.model.Passenger;
 import com.pitchbook.bootcamp.io.model.Trip;
-import com.pitchbook.bootcamp.io.source.db.FileBackedTaxiParkDb;
-import com.pitchbook.bootcamp.io.source.db.TaxiParkDb;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -83,4 +81,5 @@ public class FileBackedTaxiParkDbTest {
         assertNotNull(items);
         assertTrue(items.isEmpty());
     }
+
 }
