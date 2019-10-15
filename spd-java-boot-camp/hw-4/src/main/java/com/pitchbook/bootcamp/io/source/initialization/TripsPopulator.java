@@ -35,7 +35,7 @@ public class TripsPopulator implements DbInitializer {
         }
     }
 
-    private List<Trip> readTrips() throws IOException, ClassNotFoundException {
+   private List<Trip> readTrips() throws IOException, ClassNotFoundException {
         Path source = Paths.get(resourcePath);
         List<Trip> trips = new ArrayList<>();
         try (InputStream is = Files.newInputStream(source) ;

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.pitchbook.bootcamp.io.RelationalTaxiParkDbTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2019-10-05T17:32:59" hostname="DESKTOP-JMBMVJS" time="0.174">
+  <properties/>
+  <testcase name="driver_insertion_should_be_persistent" classname="com.pitchbook.bootcamp.io.RelationalTaxiParkDbTest" time="0.085"/>
+  <testcase name="passenger_insertion_should_be_persistent" classname="com.pitchbook.bootcamp.io.RelationalTaxiParkDbTest" time="0.013"/>
+  <testcase name="trip_insertion_should_be_persistent" classname="com.pitchbook.bootcamp.io.RelationalTaxiParkDbTest" time="0.039"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

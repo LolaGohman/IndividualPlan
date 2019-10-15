@@ -1,24 +1,7 @@
 package com.pitchbook.bootcamp;
 
-import com.pitchbook.bootcamp.io.analytics.TaxiParkDbAnalytic;
-import com.pitchbook.bootcamp.io.model.Driver;
-import com.pitchbook.bootcamp.io.source.db.FileBackedTaxiParkDb;
-import com.pitchbook.bootcamp.io.source.initialization.DriversPopulator;
-import com.pitchbook.bootcamp.io.source.initialization.PassengersPopulator;
-import com.pitchbook.bootcamp.io.source.initialization.TripsPopulator;
-import com.pitchbook.bootcamp.util.NotImplementedError;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
-
-import static java.util.Map.entry;
-
 public class Main {
-
+/*
     public static void main(String[] args) throws URISyntaxException, IOException {
 
         String dbFilePath = "hw-4/db/taxiPark.db";
@@ -51,6 +34,6 @@ public class Main {
         if (!driversEarnings.equals(expectedEarnings)) {
             throw new NotImplementedError("Task not completed");
         }
-    }
+    }*/
 
 }

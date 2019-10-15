@@ -17,11 +17,14 @@ import org.slf4j.LoggerFactory;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.Future;
 
 public class WebCrawlerWithDepth {
 
@@ -33,23 +36,37 @@ public class WebCrawlerWithDepth {
     private static final String PASS = "postgres";
     private static final DataSource dataSource = getDataSource();
     private static final int CRAWLING_DEPTH = 2;
+    private final ExecutorService executor = Executors.newFixedThreadPool(5);
 
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, ExecutionException {
+        WebCrawlerWithDepth crawler = new WebCrawlerWithDepth();
         Flyway flyway = Flyway
                 .configure()
                 .locations("db/migration")
                 .dataSource(dataSource).load();
 
         flyway.migrate();
-        WebCrawlerWithDepth crawler = new WebCrawlerWithDepth();
-        ExecutorService executor = Executors.newFixedThreadPool(5);
-        Lock locker = new ReentrantLock();
+
+        crawler.doRecursion(Collections.singletonList("http://ou3.r-pol.obr55.ru/"), 0);
+        crawler.executor.shutdown();
 
 
-        executor.execute(crawler.new Crawler("http://ou3.r-pol.obr55.ru/", 0, executor, locker));
-        executor.awaitTermination(120, TimeUnit.SECONDS);
-        executor.shutdownNow();
+    }
+
+    private void doRecursion(List<String> links, int depth) throws ExecutionException, InterruptedException {
+        if (depth < CRAWLING_DEPTH) {
+            List<String> innerLinks = new ArrayList<>();
+            for (String link : links) {
+                Future<List<String>> listFuture = executor.submit(new Crawler(link));
+                while (!listFuture.isDone()){
+                    Thread.sleep(100);
+                }
+                innerLinks.addAll(listFuture.get());
+            }
+            depth++;
+            doRecursion(innerLinks, depth);
+        }
     }
 
     private boolean checkIfResponseStatusIsOK(String url) {
@@ -73,49 +90,38 @@ public class WebCrawlerWithDepth {
     }
 
 
-    class Crawler implements Runnable {
+    class Crawler implements Callable {
 
         private String url;
-        private int depth;
-        private ExecutorService executorService;
-        private Lock locker;
 
-        Crawler(String url, int depth, ExecutorService executorService, Lock lock) {
+        Crawler(String url) {
             this.url = url;
-            this.depth = depth;
-            this.executorService = executorService;
-            this.locker = lock;
         }
 
         @Override
-        public void run() {
-            try {
-                locker.lock();
-                if (depth < CRAWLING_DEPTH) {
-                    if (checkIfResponseStatusIsOK(url)) {
-                        try {
-                            Document document = Jsoup.connect(url).get();
-                            Elements images = document.select("img[src]");
-                            Elements hrefs = document.select("a[href]");
-                            for (Element image : images) {
-                               saveElementToDatabase(image);
-                            }
-                            depth++;
-                            for (Element href : hrefs) {
-                                String linkURL = href.attr("abs:href");
-                                executorService.execute(new Crawler(linkURL, depth, executorService, locker));
-                            }
-                        } catch (IOException e) {
-                            logger.error(e.getMessage());
-                        }
+        public List<String> call() {
+            List<String> innerLinks = Collections.synchronizedList(new ArrayList<>());
+            if (checkIfResponseStatusIsOK(url)) {
+                try {
+                    Document document = Jsoup.connect(url).get();
+                    Elements images = document.select("img[src]");
+                    Elements hrefs = document.select("a[href]");
+                    for (Element image : images) {
+                        saveElementToDatabase(image);
                     }
+                    for (Element href : hrefs) {
+                        String linkURL = href.attr("abs:href");
+                        innerLinks.add(linkURL);
+                    }
+                } catch (IOException e) {
+                    logger.error(e.getMessage());
                 }
-            } finally {
-                locker.unlock();
+
             }
+            return innerLinks;
         }
 
-        private void saveElementToDatabase(Element image){
+        private void saveElementToDatabase(Element image) {
             Image imageToSave = new Image(image.attr("abs:src"));
             ObjectRepositoryImpl repository = new ObjectRepositoryImpl(dataSource);
             try {
