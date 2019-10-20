@@ -1,9 +1,17 @@
+plugins{
+    id "java"
+    id "war"
+
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
+    compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    compile group: 'javax.servlet', name: 'jstl', version: '1.2'
     compile group: 'org.flywaydb', name: 'flyway-core', version: '6.0.4'
     compile group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
     compile group: 'com.zaxxer', name: 'HikariCP', version: '3.4.1'
