@@ -2,7 +2,6 @@ package com.pitchbook.bootcamp;
 
 import com.pitchbook.bootcamp.exception.OSNotSupportedException;
 import eu.bitwalker.useragentutils.UserAgent;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebFilter;
