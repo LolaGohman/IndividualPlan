@@ -22,8 +22,11 @@ class TreeNode<T extends Comparable> {
     void insert(T value) {
         if (value == null) {
             throw new IllegalArgumentException("Binary tree cannot contains null values!");
+        } else if (rootNode == null) {
+            rootNode = new Node<>(value);
+        } else {
+            insert(value, rootNode);
         }
-        insert(value, rootNode);
     }
 
     boolean contains(T value) {
@@ -67,9 +70,10 @@ class TreeNode<T extends Comparable> {
     }
 
     private void removeLeafNode(Node<T> deleteNodeParent, T deleteValue) {
-        if (deleteNodeParent.getLeftNode() != null &&
-                equalsByComparator(deleteNodeParent.getLeftNode().getElement(), deleteValue)
-        ) {
+        if (deleteNodeParent == null) {
+            rootNode = null;
+        } else if (deleteNodeParent.getLeftNode() != null &&
+                equalsByComparator(deleteNodeParent.getLeftNode().getElement(), deleteValue)) {
             deleteNodeParent.setLeftNode(null);
         } else {
             deleteNodeParent.setRightNode(null);
@@ -92,8 +96,10 @@ class TreeNode<T extends Comparable> {
             successor.setElement(successor.getRightNode().getElement());
             successor.setLeftNode(successor.getRightNode().getLeftNode());
             successor.setRightNode(successor.getRightNode().getRightNode());
-        } else {
+        } else if (!successor.equals(deleteNode.getRightNode())) {
             successorParent.setLeftNode(null);
+        } else {
+            successorParent.setRightNode(null);
         }
     }
 

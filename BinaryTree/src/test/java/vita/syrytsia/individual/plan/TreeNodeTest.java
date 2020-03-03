@@ -2,11 +2,7 @@ package vita.syrytsia.individual.plan;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 //* You can use BinaryTreePrinter class to make some tests more demonstrative and easy to understand
 class TreeNodeTest {
@@ -31,7 +27,7 @@ class TreeNodeTest {
 
     @Test
     void shouldThrowIllegalArgumentExceptionWhenNullValuePassedThroughConstructor() {
-       assertThrows(IllegalArgumentException.class, () -> new TreeNode<>(null));
+        assertThrows(IllegalArgumentException.class, () -> new TreeNode<>(null));
     }
 
     @Test
@@ -93,7 +89,7 @@ class TreeNodeTest {
 
         actualResult.insert(2);
 
-        assertThrows(IllegalArgumentException.class, () ->  actualResult.insert(null));
+        assertThrows(IllegalArgumentException.class, () -> actualResult.insert(null));
     }
 
     @Test
@@ -102,7 +98,7 @@ class TreeNodeTest {
 
         actualResult.insert(2);
 
-        assertThrows(IllegalArgumentException.class, () ->  actualResult.remove(null));
+        assertThrows(IllegalArgumentException.class, () -> actualResult.remove(null));
     }
 
     @Test
@@ -111,7 +107,7 @@ class TreeNodeTest {
 
         actualResult.insert(2);
 
-        assertDoesNotThrow(() ->  actualResult.remove(16));
+        assertDoesNotThrow(() -> actualResult.remove(16));
     }
 
     @Test
@@ -215,6 +211,61 @@ class TreeNodeTest {
 
         assertEquals(expectedResult, treeNode);
         assertEquals(3, treeNode.size());
+        assertEquals(13, treeNode.getRootNode().getElement());
+    }
+
+    @Test
+    void shouldBeAbleToRemoveSingleRootValue() {
+        TreeNode<Integer> treeNode = new TreeNode<>(10);
+
+        treeNode.remove(10);
+
+        assertEquals(0, treeNode.size());
+    }
+
+    @Test
+    void shouldBeAbleToRemoveAllValuesFromTreeNode() {
+        TreeNode<Integer> treeNode = new TreeNode<>(10);
+
+        treeNode.insert(15);
+        treeNode.insert(2);
+        treeNode.insert(-2);
+        treeNode.insert(-5);
+        treeNode.remove(15);
+        treeNode.remove(2);
+        treeNode.remove(-2);
+        treeNode.remove(-5);
+        treeNode.remove(10);
+
+        assertEquals(0, treeNode.size());
+        assertNull(treeNode.getRootNode());
+    }
+
+    @Test
+    void shouldRemoveWhenDeleteElementHasTwoChildrenAndSuccessorIsRightAfterDeleteElement() {
+        TreeNode<Integer> treeNode = new TreeNode<>(10);
+        treeNode.insert(15);
+        treeNode.insert(3);
+        treeNode.remove(10);
+
+        TreeNode<Integer> expectedResult = new TreeNode<>(15);
+        expectedResult.insert(3);
+
+        assertEquals(expectedResult, treeNode);
+        assertEquals(2, treeNode.size());
+    }
+
+    @Test
+    void firstAddedValueToTreeWith0SizeShouldBeRootValue() {
+        TreeNode<Integer> treeNode = new TreeNode<>(10);
+
+        treeNode.insert(15);
+        treeNode.remove(10);
+        treeNode.remove(15);
+        treeNode.insert(3);
+
+        assertEquals(3, treeNode.getRootNode().getElement());
+        assertEquals(1, treeNode.size());
     }
 
     private TreeNode<Integer> createNodeForInsertionTest() {
