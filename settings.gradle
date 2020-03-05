@@ -2,4 +2,5 @@ rootProject.name = 'IndividualPlan'
 include 'Recursion'
 include 'BinarySearch'
 include 'BinaryTree'
+include 'Sortings'
 
