@@ -2,7 +2,7 @@ package vita.syrytsia.individual.plan;
 
 import java.util.Objects;
 
-public class Node<T extends Comparable> {
+class Node<T extends Comparable<T>> {
     private T element;
     private Node<T> leftNode;
     private Node<T> rightNode;
