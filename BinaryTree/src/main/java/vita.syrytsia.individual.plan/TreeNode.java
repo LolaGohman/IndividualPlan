@@ -4,7 +4,7 @@ import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Objects;
 
-class TreeNode<T extends Comparable> {
+class TreeNode<T extends Comparable<T>> {
 
     private Node<T> rootNode;
 
@@ -89,8 +89,9 @@ class TreeNode<T extends Comparable> {
 
     private void removeNodeThatHasBothChildren(final Node<T> deleteNode) {
         Node<T> successorParent = deleteNode;
-        Node<T> successor = getSuccessor(deleteNode.getRightNode(), successorParent).getKey();
-        successorParent = getSuccessor(deleteNode.getRightNode(), successorParent).getValue();
+        final Map.Entry<Node<T>, Node<T>> successorEntry = getSuccessor(deleteNode.getRightNode(), successorParent);
+        Node<T> successor = successorEntry.getKey();
+        successorParent = successorEntry.getValue();
         deleteNode.setElement(successor.getElement());
         if (successor.getRightNode() != null) {
             successor.setElement(successor.getRightNode().getElement());

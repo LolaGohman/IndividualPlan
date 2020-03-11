@@ -8,7 +8,10 @@ import java.util.stream.Collectors;
 
 public class ListBinarySearcher {
 
+    // TODO @AndrewG: how to remember original order without SearchResult object memory overhead?
+    // TODO @AndrewG: in real life current approach will not work. Consider we add 10_000 times by 1 element to the list and call search each time? OR just call search over 1m elements 10k times?
     public static <T extends Comparable> Optional<SearchResult<T>> searchElementInList(List<T> elements, T element) {
+
         AtomicInteger index = new AtomicInteger();
         List<SearchResult<T>> originalElements = elements.stream()
                 .map(e -> new SearchResult<>(index.getAndIncrement(), e))
