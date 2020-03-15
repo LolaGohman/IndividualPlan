@@ -1,7 +1,5 @@
 package vita.syrytsia.individual.plan;
 
-import java.util.AbstractMap;
-import java.util.Map;
 import java.util.Objects;
 
 class TreeNode<T extends Comparable<T>> {
@@ -15,6 +13,10 @@ class TreeNode<T extends Comparable<T>> {
         rootNode = new Node<>(rootValue);
     }
 
+    TreeNode() {
+
+    }
+
     int size() {
         return size(rootNode);
     }
@@ -22,23 +24,18 @@ class TreeNode<T extends Comparable<T>> {
     void insert(T value) {
         if (value == null) {
             throw new IllegalArgumentException("Binary tree cannot contains null values!");
-        } else if (rootNode == null) {
-            rootNode = new Node<>(value);
-        } else {
-            insert(value, rootNode);
         }
+        rootNode = insert(value, rootNode);
+    }
+
+    void remove(T value) {
+        rootNode = remove(rootNode, value);
     }
 
     boolean contains(T value) {
         return contains(rootNode, value);
     }
 
-    void remove(T value) {
-        if (value == null) {
-            throw new IllegalArgumentException("You cannot remove null value from binary tree!");
-        }
-        remove(rootNode, null, value);
-    }
 
     Node<T> getRootNode() {
         return rootNode;
@@ -52,105 +49,41 @@ class TreeNode<T extends Comparable<T>> {
         }
     }
 
-    private void remove(Node<T> currentNode, Node<T> currentNodeParent, T value) {
-        if (!contains(value)) return;
-        if (equalsByComparator(currentNode.getElement(), value)) {
-            if (hasBothChildren(currentNode)) {
-                removeNodeThatHasBothChildren(currentNode);
-            } else if (hasOnlyOneChildren(currentNode)) {
-                removeNodeThatHasOneChildren(currentNode);
-            } else if (isLeaf(currentNode)) {
-                removeLeafNode(currentNodeParent, value);
-            }
-        } else if (value.compareTo(currentNode.getElement()) < 0) {
-            remove(currentNode.getLeftNode(), currentNode, value);
-        } else {
-            remove(currentNode.getRightNode(), currentNode, value);
+    private Node<T> remove(Node<T> currentNode, T value) {
+        if (currentNode == null) return null;
+        int compareResult = value.compareTo(currentNode.getElement());
+        if (compareResult < 0) currentNode.setLeftNode(remove(currentNode.getLeftNode(), value));
+        else if (compareResult > 0) currentNode.setRightNode(remove(currentNode.getRightNode(), value));
+        else {
+            if (currentNode.getRightNode() == null) return currentNode.getLeftNode();
+            if (currentNode.getLeftNode() == null) return currentNode.getRightNode();
+            Node<T> copy = currentNode;
+            currentNode = min(copy.getRightNode());
+            currentNode.setRightNode(removeMin(copy.getRightNode()));
+            currentNode.setLeftNode(copy.getLeftNode());
         }
+        return currentNode;
     }
 
-    private void removeLeafNode(Node<T> deleteNodeParent, T deleteValue) {
-        if (deleteNodeParent == null) {
-            rootNode = null;
-        } else if (deleteNodeParent.getLeftNode() != null &&
-                equalsByComparator(deleteNodeParent.getLeftNode().getElement(), deleteValue)) {
-            deleteNodeParent.setLeftNode(null);
-        } else {
-            deleteNodeParent.setRightNode(null);
-        }
+    private Node<T> min(Node<T> currentNode) {
+        if (currentNode.getLeftNode() == null) return currentNode;
+        return min(currentNode.getLeftNode());
     }
 
-    private void removeNodeThatHasOneChildren(Node<T> currentNode) {
-        Node<T> children = currentNode.getRightNode() != null ? currentNode.getRightNode() : currentNode.getLeftNode();
-        currentNode.setElement(children.getElement());
-        currentNode.setLeftNode(children.getLeftNode());
-        currentNode.setRightNode(children.getRightNode());
+    private Node<T> removeMin(Node<T> currentNode) {
+        if (currentNode.getLeftNode() == null) return currentNode.getRightNode();
+        currentNode.setLeftNode(removeMin(currentNode.getLeftNode()));
+        return currentNode;
     }
 
-    private void removeNodeThatHasBothChildren(final Node<T> deleteNode) {
-        Node<T> successorParent = deleteNode;
-        final Map.Entry<Node<T>, Node<T>> successorEntry = getSuccessor(deleteNode.getRightNode(), successorParent);
-        Node<T> successor = successorEntry.getKey();
-        successorParent = successorEntry.getValue();
-        deleteNode.setElement(successor.getElement());
-        if (successor.getRightNode() != null) {
-            successor.setElement(successor.getRightNode().getElement());
-            successor.setLeftNode(successor.getRightNode().getLeftNode());
-            successor.setRightNode(successor.getRightNode().getRightNode());
-        } else if (!successor.equals(deleteNode.getRightNode())) {
-            successorParent.setLeftNode(null);
-        } else {
-            successorParent.setRightNode(null);
-        }
-    }
-
-    private Map.Entry<Node<T>, Node<T>> getSuccessor(Node<T> rightNode, Node<T> successorParent) {
-        if (rightNode.getLeftNode() == null) {
-            return new AbstractMap.SimpleEntry<>(rightNode, successorParent);
-        } else {
-            return getSuccessor(rightNode.getLeftNode(), rightNode);
-        }
-    }
-
-    private boolean hasBothChildren(Node<T> node) {
-        return node != null &&
-                node.getLeftNode() != null &&
-                node.getRightNode() != null;
-    }
-
-    private boolean hasOnlyOneChildren(Node<T> node) {
-        return node != null &&
-                (node.getLeftNode() != null ||
-                        node.getRightNode() != null);
-    }
-
-    private boolean isLeaf(Node<T> node) {
-        return node != null &&
-                node.getLeftNode() == null &&
-                node.getRightNode() == null;
-    }
-
-
-    private boolean equalsByComparator(T elementFirst, T elementSecond) {
-        return elementFirst.compareTo(elementSecond) == 0;
-    }
-
-    private void insert(T value, Node<T> currentNode) {
-        if (currentNode == null || value == null)
-            return;
-        if (value.compareTo(currentNode.getElement()) < 0) {
-            if (currentNode.getLeftNode() == null) {
-                currentNode.setLeftNode(new Node<>(value));
-            } else {
-                insert(value, currentNode.getLeftNode());
-            }
-        } else if (value.compareTo(currentNode.getElement()) > 0) {
-            if (currentNode.getRightNode() == null) {
-                currentNode.setRightNode(new Node<>(value));
-            } else {
-                insert(value, currentNode.getRightNode());
-            }
-        }
+    private Node<T> insert(T element, Node<T> currentNode) {
+        if (currentNode == null) return new Node<>(element);
+        int compareResult = element.compareTo(currentNode.getElement());
+        if (compareResult < 0)
+            currentNode.setLeftNode(insert(element, currentNode.getLeftNode()));
+        else if (compareResult > 0)
+            currentNode.setRightNode(insert(element, currentNode.getRightNode()));
+        return currentNode;
     }
 
     private boolean contains(Node<T> current, T value) {
@@ -163,6 +96,10 @@ class TreeNode<T extends Comparable<T>> {
                     ? contains(current.getLeftNode(), value)
                     : contains(current.getRightNode(), value);
         }
+    }
+
+    private boolean equalsByComparator(T elementFirst, T elementSecond) {
+        return elementFirst.compareTo(elementSecond) == 0;
     }
 
     @Override

@@ -17,10 +17,6 @@ class Node<T extends Comparable<T>> {
         return element;
     }
 
-    void setElement(T element) {
-        this.element = element;
-    }
-
     public Node<T> getLeftNode() {
         return leftNode;
     }
@@ -60,4 +56,5 @@ class Node<T extends Comparable<T>> {
     public int hashCode() {
         return Objects.hash(element, leftNode, rightNode);
     }
+
 }

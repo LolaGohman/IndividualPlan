@@ -6,7 +6,7 @@ public class Main {
 
     public static void main(String[] args) {
         treePerformance(3200_000);
-//        printTree();
+        //        printTree();
     }
 
     private static void treePerformance(int nodesCount) {

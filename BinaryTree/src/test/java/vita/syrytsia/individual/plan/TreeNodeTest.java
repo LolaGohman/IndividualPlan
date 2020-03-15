@@ -26,6 +26,16 @@ class TreeNodeTest {
     }
 
     @Test
+    void shouldBeAbleToCreateEmptyTree() {
+        TreeNode<Integer> node = new TreeNode<>();
+        assertEquals(0, node.size());
+
+        node.insert(1);
+
+        assertEquals(1, node.size());
+    }
+
+    @Test
     void shouldThrowIllegalArgumentExceptionWhenNullValuePassedThroughConstructor() {
         assertThrows(IllegalArgumentException.class, () -> new TreeNode<>(null));
     }
@@ -93,12 +103,12 @@ class TreeNodeTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenTryToRemoveNullValue() {
+    void shouldNotThrowExceptionWhenTryToRemoveNullValue() {
         TreeNode<Integer> actualResult = new TreeNode<>(1);
 
         actualResult.insert(2);
 
-        assertThrows(IllegalArgumentException.class, () -> actualResult.remove(null));
+        assertEquals(2, actualResult.size());
     }
 
     @Test
