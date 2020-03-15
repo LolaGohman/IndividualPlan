@@ -1,20 +1,20 @@
 package vita.syrytsia.individual.plan;
 
-import static vita.syrytsia.individual.plan.PascalsTriangleCounter.getValueForCell;
+import java.util.List;
 
 class PascalsTrianglePrinter {
 
-    static void printPascalsTriangle(int numberOfRows) {
-        int maxNum = getMaxPascalsTriangleValue(numberOfRows);
-        int cellWidth = Integer.toString(maxNum).length();
-
-        for (int i = 0; i < numberOfRows; i++) {
-
+    static void print(PascalsTriangle pascalsTriangle) {
+        long maxNum = getMaxPascalsTriangleValue(pascalsTriangle);
+        int cellWidth = Long.toString(maxNum).length();
+        int numberOfRows = pascalsTriangle.size();
+        for (int i = 0; i< numberOfRows; i++) {
             int whitespaceBetweenValueAndBeginningOfArray = (numberOfRows - 1 - i) * (cellWidth + 1) / 2;
-            if (whitespaceBetweenValueAndBeginningOfArray > 0)
+            if (whitespaceBetweenValueAndBeginningOfArray > 0) {
                 System.out.printf("%" + whitespaceBetweenValueAndBeginningOfArray + "s", "");
+            }
             for (int j = 0; j <= i; j++) {
-                String value = Integer.toString(getValueForCell(i, j));
+                String value = pascalsTriangle.getElementsList().get(i).get(j).toString();
                 int totalPad = cellWidth - value.length();
                 int rightPad = totalPad / 2;
                 int leftPad = totalPad - rightPad;
@@ -26,15 +26,18 @@ class PascalsTrianglePrinter {
                     value = String.format("%" + leftPad + "s%s", "", value);
                 }
                 System.out.print(value);
-                if (j < i)
+                if (j < i) {
                     System.out.print(" ");
-                else
+                } else {
                     System.out.println();
+                }
             }
+
         }
     }
 
-    private static int getMaxPascalsTriangleValue(int numberOfRows) {
-        return getValueForCell(numberOfRows - 1, (numberOfRows - 1) / 2);
+    private static long getMaxPascalsTriangleValue(PascalsTriangle pascalsTriangle) {
+        List<Long> bottomRow = pascalsTriangle.getLast();
+        return bottomRow.get(bottomRow.size() / 2);
     }
 }
