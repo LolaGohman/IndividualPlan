@@ -1,47 +1,63 @@
 package vita.syrytsia.individual.plan;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
-public class ListBinarySearcher {
+public class ListBinarySearcher<T extends Comparable<T>> {
 
     // TODO @AndrewG: how to remember original order without SearchResult object memory overhead?
     // TODO @AndrewG: in real life current approach will not work. Consider we add 10_000 times by 1 element to the list and call search each time? OR just call search over 1m elements 10k times?
-    public static <T extends Comparable> Optional<SearchResult<T>> searchElementInList(List<T> elements, T element) {
 
-        AtomicInteger index = new AtomicInteger();
-        List<SearchResult<T>> originalElements = elements.stream()
-                .map(e -> new SearchResult<>(index.getAndIncrement(), e))
-                .sorted((searchResult1, searchResult2) -> searchResult1.getElement().compareTo(searchResult2.getElement()))
-                .collect(Collectors.toList());
-        return searchElement(originalElements, element);
+    private List<T> sortedElements;
+
+    ListBinarySearcher(List<T> elements) {
+        if (!isSorted(elements)) {
+            throw new IllegalArgumentException("Please, sort list before using binary search");
+        }
+        this.sortedElements = elements;
     }
 
-    private static <T extends Comparable> Optional<SearchResult<T>> searchElement(List<SearchResult<T>> elements, T element) {
-        int centerIndex = (elements.size() - 1) / 2;
-        SearchResult<T> centerElement = elements.get(centerIndex);
+    public int searchElementInList(T element) {
+        if (sortedElements.isEmpty()) {
+            return -1;
+        }
+        return searchElement(0, sortedElements.size() - 1, element).orElse(-1);
+    }
 
-        int elCompareResult = element.compareTo(centerElement.getElement());
+    private boolean isSorted(List<T> elements) {
+        for (int i = 0; i < elements.size() - 1; i++) {
+            if (elements.get(i).compareTo(elements.get(i + 1)) > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Optional<Integer> searchElement(
+            int leftBound,
+            int rightBound,
+            T element
+    ) {
+        int size = getSizeOfInnerArray(leftBound, rightBound);
+        int centerIndex = getCenterIndexOfInnerArray(leftBound, rightBound);
+        T centerElement = sortedElements.get(centerIndex);
+        int elCompareResult = element.compareTo(centerElement);
+
         if (elCompareResult == 0) {
-            return Optional.of(centerElement);
-        } else if (elements.size() == 1) {
+            return Optional.of(centerIndex);
+        } else if (size == 1) {
             return Optional.empty();
         }
-        int leftBound = elCompareResult  < 0 ?  0                                      : centerIndex + 1;
-        int rightBound = elCompareResult < 0 ? (centerIndex > 0 ? centerIndex - 1 : 0) : elements.size() - 1;
-
-        return searchElement(sublistInclusive(elements, leftBound, rightBound), element);
+        int newLeftBound = elCompareResult < 0 ? leftBound : centerIndex + 1;
+        int newRightBound = elCompareResult < 0 ? Math.max(centerIndex - 1, newLeftBound) : rightBound;
+        return searchElement(newLeftBound, newRightBound, element);
     }
 
-    private static <T> List<T> sublistInclusive(List<T> elements, int leftBound, int rightBound) {
-        List<T> list = new ArrayList<>();
-        if (rightBound >= leftBound) {
-            list = elements.subList(leftBound, rightBound);
-            list.add(elements.get(rightBound));
-        }
-        return list;
+    private int getSizeOfInnerArray(int leftBound, int rightBound) {
+        return rightBound - leftBound + 1;
+    }
+
+    private int getCenterIndexOfInnerArray(int leftBound, int rightBound) {
+        return (rightBound + leftBound) / 2;
     }
 }
