@@ -1,31 +1,28 @@
 package vita.syrytsia.individual.plan;
 
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
 class PascalsTriangle {
 
-    private LinkedList<List<Long>> elementsList;
+    private final Deque<List<Long>> elementsList = new LinkedList<>();
 
-    PascalsTriangle() {
-        elementsList = new LinkedList<>();
-    }
-
-    public void setElementsList(LinkedList<List<Long>> elementsList) {
-        this.elementsList = elementsList;
-    }
-
-    LinkedList<List<Long>> getElementsList() {
+    Deque<List<Long>> getElementsList() {
         return elementsList;
     }
 
-    List<Long> getLast(){
+    List<Long> getLast() {
         return elementsList.getLast();
     }
 
-    int size(){
+    int size() {
         return elementsList.size();
+    }
+
+    void addRow(List<Long> row) {
+        elementsList.add(row);
     }
 
     @Override

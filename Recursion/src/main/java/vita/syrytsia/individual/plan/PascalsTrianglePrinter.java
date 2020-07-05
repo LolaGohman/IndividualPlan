@@ -1,24 +1,24 @@
 package vita.syrytsia.individual.plan;
 
+import java.util.LinkedList;
 import java.util.List;
 
 class PascalsTrianglePrinter {
 
-    static void print(PascalsTriangle pascalsTriangle) {
-        long maxNum = getMaxPascalsTriangleValue(pascalsTriangle);
-        int cellWidth = Long.toString(maxNum).length();
-        int numberOfRows = pascalsTriangle.size();
-        for (int i = 0; i< numberOfRows; i++) {
-            int whitespaceBetweenValueAndBeginningOfArray = (numberOfRows - 1 - i) * (cellWidth + 1) / 2;
-            if (whitespaceBetweenValueAndBeginningOfArray > 0) {
-                System.out.printf("%" + whitespaceBetweenValueAndBeginningOfArray + "s", "");
-            }
-            for (int j = 0; j <= i; j++) {
-                String value = pascalsTriangle.getElementsList().get(i).get(j).toString();
-                int totalPad = cellWidth - value.length();
-                int rightPad = totalPad / 2;
-                int leftPad = totalPad - rightPad;
+    private PascalsTrianglePrinter() {
+        //hides public constructor
+    }
 
+    static void print(PascalsTriangle pascalsTriangle) {
+        final long maxNum = getMaxPascalsTriangleValue(pascalsTriangle);
+        final int cellWidth = Long.toString(maxNum).length() + 2;
+
+        pascalsTriangle.getElementsList().forEach(longs -> {
+            longs.forEach(l -> {
+                String value = l.toString();
+                final int totalPad = cellWidth - value.length();
+                final int rightPad = totalPad / 2;
+                final int leftPad = totalPad - rightPad;
                 if (rightPad > 0) {
                     value = String.format("%s%" + rightPad + "s", value, "");
                 }
@@ -26,18 +26,14 @@ class PascalsTrianglePrinter {
                     value = String.format("%" + leftPad + "s%s", "", value);
                 }
                 System.out.print(value);
-                if (j < i) {
-                    System.out.print(" ");
-                } else {
-                    System.out.println();
-                }
-            }
-
-        }
+            });
+            System.out.println();
+        });
     }
 
     private static long getMaxPascalsTriangleValue(PascalsTriangle pascalsTriangle) {
-        List<Long> bottomRow = pascalsTriangle.getLast();
-        return bottomRow.get(bottomRow.size() / 2);
+        LinkedList<List<Long>> pascalsTriangleRows = (LinkedList<List<Long>>) pascalsTriangle.getElementsList();
+        List<Long> elements = pascalsTriangleRows.get((pascalsTriangleRows.size() / 2) + (pascalsTriangleRows.size() % 2));
+        return elements.get(elements.size() - 1);
     }
 }

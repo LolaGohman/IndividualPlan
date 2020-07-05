@@ -23,6 +23,7 @@ class ListBinarySearcherTest {
         assertThrows(IllegalArgumentException.class, () -> new ListBinarySearcher<>(list));
     }
 
+    @MethodSource("source")
     private static Object[][] source() {
         return new Object[][]{
                 {List.of(1, 2, 18, 20, 34), 1, 0},
@@ -52,6 +53,7 @@ class ListBinarySearcherTest {
         };
     }
 
+    @MethodSource("failedSource")
     private static Object[][] failedSource() {
         return new Object[][]{
                 {List.of(5, 6, 7, 9, 13, -13)},
